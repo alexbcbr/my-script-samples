@@ -1,0 +1,5 @@
+bash -x script.sh (faz debug de um script)
+bash -xv script.sh (mistrura informacoes de conteudo e execucao)
+)
+trap "" DEBUG
+trap read DEBUG (ligar e desligar passo a passo)
