@@ -1,7 +1,9 @@
-from datetime import datetime
+#!/usr/bin/python
 
-#Aplicacao demo para pegar dados do teclado e imprimir os valores na tela em um o
+#Aplicacao demo demonstrando diversas instrucoes em python
 #
+
+from datetime import datetime
 
 def camiseta():
 	codProduto = 1
