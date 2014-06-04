@@ -6,9 +6,15 @@
 echo "Digite o código do produto: "
 read codProduto
 
-if test "$codProduto" = "1"
+if [ $codProduto -eq "1" ]
 then
 	echo "Produto $codProduto é camiseta"
-else
+
+elif [ $codProduto -eq "2"]
+then
 	echo "Produto $codProduto é calca"
+
+else
+	echo "Produto $codProduto não cadastrado"
+
 fi
