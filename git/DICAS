@@ -1,0 +1,18 @@
+#configuracao do github
+git config --global push.default simple
+git config --global user.name “AlexBC”
+git config --global user.email alexbcbr@gmail.com
+
+
+#comanndos de clone
+git clone https://github.com/alexbcbr/my-script-samples.git
+
+#comandos de atualizacao
+git status
+git add -all
+git commit -m “mensagem”
+git push
+
+#atualizar a sua pasta local com a ultima versao
+git pull
+
