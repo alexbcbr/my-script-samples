@@ -16,3 +16,6 @@ git push
 #atualizar a sua pasta local com a ultima versao
 git pull
 
+#resetar tudo
+git reset --hard origin/master
+
