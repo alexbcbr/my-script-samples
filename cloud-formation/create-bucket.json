@@ -1,0 +1,46 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Criar um bucket para armazenar um website",
+
+  "Parameters": {
+      "NomeDoBucket": {
+        "Description": "Forneca o nome do bucket a ser criado",
+        "Type": "String",
+        "Default": "meusite-alexbc",
+        "MinLength": "5",
+        "MaxLength": "20"
+      }
+  },
+
+  "Resources": {
+    "S3Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "AccessControl": "PublicRead",
+        "BucketName": { "Ref": "NomeDoBucket"},
+        "WebsiteConfiguration": {
+            "ErrorDocument": "error.html",
+            "IndexDocument": "index.html"
+        }
+      }
+    }
+
+  },
+
+  "Outputs": {
+        "WebsiteURL": {
+          "Description": "URL do website",
+          "Value": {"Fn::GetAtt": ["S3Bucket", "WebsiteURL"]
+          }
+        },
+
+        "S3BucketSecureURL": {
+          "Description": "Nome do S3 bucket que esta armazenando o conteudo do site",
+          "Value": { "Fn::Join": ["",
+              ["https://", {"Fn::GetAtt": ["S3Bucket", "DomainName"]}]
+            ]
+          }
+        }
+  }
+
+}

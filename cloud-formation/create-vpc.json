@@ -1,0 +1,120 @@
+{
+    
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "Cria uma VPC com uma instancia EC2",
+
+  "Mappings" : {
+
+    "SubnetConfig" : {
+      "VPC" : {"CIDR" : "10.0.0.0/16"},
+      "Public" : {"CIDR" : "10.0.0.0/24"}
+    },
+
+    "RegionMap" : {
+      "us-east-1" : {
+          "AMI" : "ami-76f0061f"
+      },
+      "us-west-1" : {
+          "AMI" : "ami-655a0a20"
+      },
+      "sa-east-1" : {
+          "AMI" : "ami-c7e649da"
+      }
+    }
+  },
+
+  "Resources" : {
+
+    "VPC": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "EnableDnsSupport": "true",
+        "EnableDnsHostnames": "true",
+        "CidrBlock" : { "Fn::FindInMap" : [ "SubnetConfig", "VPC", "CIDR" ]},
+        "Tags" : [
+          {"Key" : "Application", "Value": {"Ref" : "AWS::StackName"}},
+          {"Key" : "Network", "Value": "Public"}
+        ]
+      }
+    },
+
+    "PublicSubnet": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "VpcId": {"Ref" : "VPC"},
+        "CidrBlock" : { "Fn::FindInMap" : [ "SubnetConfig", "Public", "CIDR" ]},
+        "Tags" : [
+          {"Key" : "Application", "Value": {"Ref" : "AWS::StackName"}},
+          {"Key" : "Network", "Value": "Public"}
+        ]
+      }
+    },
+
+    "InternetGateway" : {
+      "Type" : "AWS::EC2::InternetGateway"
+    },
+
+    "GatewayToInternet" : {
+      "Type" : "AWS::EC2::VPCGatewayAttachment",
+      "Properties" : {
+        "VpcId" : { "Ref" : "VPC"},
+        "InternetGatewayId" : {"Ref" : "InternetGateway"}
+      }
+    },
+
+    "PublicRouteTable" : {
+      "Type" : "AWS::EC2::RouteTable",
+      "Properties" : {
+        "VpcId" : { "Ref" : "VPC"}
+      }
+    },
+
+    "PublicRoute" : {
+      "Type" : "AWS::EC2::Route",
+      "DependsOn" : "GatewayToInternet",
+      "Properties" : {
+        "RouteTableId" : { "Ref" : "PublicRouteTable"},
+        "DestinationCidrBlock" : "0.0.0.0/0",
+        "GatewayId" : { "Ref" : "InternetGateway" }
+      }
+    },
+
+    "PublicSubnetRouteTableAssociation" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "PublicSubnet"},
+        "RouteTableId" : { "Ref" : "PublicRouteTable" }
+      }
+    },
+
+    "PublicEc2Instance" : {
+      "Type" : "AWS::EC2::Instance",
+      "DependsOn" : "GatewayToInternet",
+      "Properties" : {
+        "InstanceType" : "t1.micro",
+        "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ]},
+        "NetworkInterfaces" : [ {
+            "DeviceIndex": "0",
+            "AssociatePublicIpAddress" : "true",
+            "DeleteOnTermination" : "true",
+            "SubnetId" : { "Ref" : "PublicSubnet" }
+        } ]
+      }
+    }
+  },
+
+  "Outputs" : {
+    "InstanceId" : {
+      "Description" : "InstanceId que foi criada",
+      "Value" : { "Ref" : "PublicEc2Instance" }
+    },
+    "AZ" : {
+      "Description" : "Availability Zone que foi criada",
+      "Value" : { "Fn::GetAtt" : [ "PublicEc2Instance", "AvailabilityZone" ] }
+    },
+    "PublicIP" : {
+      "Description" : "Public IP address que foi criado",
+      "Value" : { "Fn::GetAtt" : [ "PublicEc2Instance", "PublicIp" ] }
+    }
+  }
+}
