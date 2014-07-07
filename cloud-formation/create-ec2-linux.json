@@ -1,0 +1,104 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "Cria uma instancia EC2 Amazon Linux. A AMI eh selecionada baseada na region onde o stack esta rodando.",
+
+  "Parameters" : {
+    "KeyName" : {
+      "Description" : "Nome da EC2 KeyPair para acessar o SSH access na instancia",
+      "Type" : "String",
+      "MinLength": "1",
+      "MaxLength": "255",
+      "AllowedPattern": "[\\x20-\\x7E]*",
+      "ConstraintDescription": "Apenas caracteres ASCII sao permitidos"
+    },
+
+    "VpcId" : {
+      "Type": "String",
+      "Description": "Vpc id de uma VPC existente"
+    },
+
+    "SubnetId" : {
+      "Type": "String",
+      "Description": "Subnet id em uma VPC existente"
+    },
+
+    "SSHLocation" : {
+      "Type": "String",
+      "Description": "O range de IP que pode ser usado para o SSH",
+      "MinLength": "9",
+      "MaxLength": "18",
+      "Default": "0.0.0.0/0",
+      "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
+      "ConstraintDescription": "Sao validos apenas ranges em x.x.x.x/x"
+    } 
+  },
+
+
+  "Mappings" : {
+    "RegionMap" : {
+      "us-east-1" : {
+          "AMI" : "ami-76f0061f"
+      },
+      "us-west-1" : {
+          "AMI" : "ami-655a0a20"
+      },
+      "sa-east-1" : {
+          "AMI" : "ami-c7e649da"
+      }
+    }
+  },
+
+  "Resources" : {
+
+    "IPAddress" : {
+      "Type" : "AWS::EC2::EIP",
+      "Properties" : {
+        "Domain" : "vpc",
+        "InstanceId" : { "Ref" : "Ec2Instance" }
+      }
+    },
+
+    "InstanceSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Habilita acesso SSH na porta 22",
+        "VpcId": { "Ref": "VpcId"},
+        "SecurityGroupIngress" : [ {
+          "IpProtocol" : "tcp",
+          "FromPort" : "22",
+          "ToPort" : "22",
+          "CidrIp" : { "Ref" : "SSHLocation"}
+        } ]
+      }
+    },
+
+    "Ec2Instance" : {
+      "Type" : "AWS::EC2::Instance",
+      "Properties" : {
+        "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ]},
+        "SecurityGroupIds" : [ { "Ref" : "InstanceSecurityGroup" } ],
+        "SubnetId" : { "Ref" : "SubnetId" },
+        "KeyName" : { "Ref" : "KeyName" },
+        "Tags": [
+          { "Key" : "Name", "Value": "LinuxSrv" },
+          { "Key" : "Ambiente", "Value" : "Desenvolvimento" }
+        ]
+      }
+    }
+  },
+
+  "Outputs" : {
+    "InstanceId" : {
+      "Description" : "InstanceId que foi criada",
+      "Value" : { "Ref" : "Ec2Instance" }
+    },
+    "AZ" : {
+      "Description" : "Availability Zone que foi criada",
+      "Value" : { "Fn::GetAtt" : [ "Ec2Instance", "AvailabilityZone" ] }
+    },
+    "PublicIP" : {
+      "Description" : "Public IP address que foi criado",
+      "Value" : { "Fn::GetAtt" : [ "Ec2Instance", "PublicIp" ] }
+    }
+  }
+}
