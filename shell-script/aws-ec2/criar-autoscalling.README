@@ -1,0 +1,23 @@
+# listar regioes
+ec2-describe-regions
+
+# criar launch configuration
+as-create-launch-config --image-id ami-9b369886 --instance-type t1.micro --key education-keypair --group sg-d8d82dbd --launch-config lab-lc --region sa-east-1
+
+# criar auto scaling group
+as-create-auto-scaling-group lab-asg --availability-zones sa-east-1a --launch-configuration lab-lc --max-size 2 --min-size 1 --region sa-east-1
+
+# incluir tags
+as-create-or-update-tags --tag "id=lab-asg, t=auto-scaling-group, k=Name, v=AS-Web-Server, p=true" --region sa-east-1
+
+# mostrar as notificacoes associadas ao auto-scaling
+as-describe-auto-scaling-notification-types
+
+#Scale up
+as-put-scaling-policy lab-scale-up-policy --auto-scaling-group lab-asg --adjustment=1 --type ChangeInCapacity --cooldown 300 --region sa-east-1
+
+#Scale Down
+as-put-scaling-policy lab-scale-down-policy --auto-scaling-group lab-asg --adjustment=-1 --type ChangeInCapacity --cooldown 300 --region sa-east-1
+
+# View activities
+as-describe-scaling-activities --show-long --region sa-east-1
