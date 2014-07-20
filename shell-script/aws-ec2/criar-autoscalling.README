@@ -1,6 +1,9 @@
 # listar regioes
 ec2-describe-regions
 
+#ver todos comandos de auto scalling
+as-cmd
+
 # criar launch configuration
 as-create-launch-config --image-id ami-9b369886 --instance-type t1.micro --key education-keypair --group sg-d8d82dbd --launch-config lab-lc --region sa-east-1
 
@@ -21,3 +24,7 @@ as-put-scaling-policy lab-scale-down-policy --auto-scaling-group lab-asg --adjus
 
 # View activities
 as-describe-scaling-activities --show-long --region sa-east-1
+
+#ver tipos de notificacao
+as-describe-auto-scaling-notification-types
+
