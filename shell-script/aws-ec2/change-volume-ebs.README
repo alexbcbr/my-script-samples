@@ -1,0 +1,2 @@
+# DETACH volume EBS
+aws ec2 detach-volume --volume-id vol-f88349f5
