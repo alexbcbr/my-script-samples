@@ -1,0 +1,11 @@
+# Criar o launch configuration
+as-create-launch-config --image-id ami-4b43eb56 --instance-type t2.micro --key education-keypair --group sg-0df90f68 --launch-config prov-alex --region sa-east-1
+
+# Criar o autoscalling group
+as-create-auto-scaling-group asg-linux --availability-zones sa-east-1a --launch-configuration prov-alex --max-size 0 --min-size 0 --region sa-east-1
+
+# setar schedule para todos os dias as 16:30
+as-put-scheduled-update-group-action desligar --auto-scaling-group asg-linux --recurrence "55 16 * * *" --desired-capacity 1 --region sa-east-1
+
+# Ver ações scheduladas
+as-describe-scheduled-actions --auto-scaling-group asg-linux --region sa-east-1
