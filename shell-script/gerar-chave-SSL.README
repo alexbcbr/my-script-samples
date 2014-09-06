@@ -1,0 +1,8 @@
+#Gerar chave SSL
+openssl genrsa 2048 > private-key.pem
+
+#Gerar certificado
+openssl req -new -key private-key.pem -out csr.pem
+
+#Gerar certificado SSL por meio (Free SSL certificate)
+http://www.instantssl.com/
