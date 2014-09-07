@@ -1,0 +1,24 @@
+# Download do iperf
+http://sourceforge.net/projects/iperf/files/
+
+#Transferir arquivo
+scp -i arquivo-keypair.pem iperf-2.0.5.tar.gz ec2-user@11.111.11.111:/home/ec2-user/iperf-2.0.5.tar.gz
+
+#Instancia EC2 (Instalar pre-requisitos)
+sudo yum install make
+sudo yum install gcc
+yum search gcc-c++
+sudo yum install gcc-c++
+
+#Instancia EC2 (Instalar iperf) (obs: NAO fazer como sudo -s)
+tar -xvf iperf-2.0.5.tar.gz 
+cd iperf-2.0.5
+./configure
+make
+sudo make install
+
+#Iniciar iperf server
+iperf -s
+
+#Chamar o client para fazer o teste
+iperf -c localhost
