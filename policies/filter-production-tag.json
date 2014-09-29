@@ -1,0 +1,12 @@
+"Statement": [
+    {
+      "Action": "ec2:*",
+      "Effect": "Allow",
+      "Resource": "*",
+      "Condition": {
+         "StringEquals": {
+            "ec2:ResourceTag/InstanceType": "Production"         
+         }
+      }
+    }
+  ]
