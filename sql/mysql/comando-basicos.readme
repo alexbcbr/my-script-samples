@@ -1,0 +1,15 @@
+sudo yum install mysql
+
+mysql -h govinstance.cftexyidv059.sa-east-1.rds.amazonaws.com -u dbadmin -p
+
+create database demo;
+drop database demo;
+
+show databases;
+show tables;
+
+use demo;
+
+source customers.sql
+
+TRUNCATE TABLE nome-da-tabela;
