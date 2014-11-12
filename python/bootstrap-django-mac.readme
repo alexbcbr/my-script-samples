@@ -1,0 +1,18 @@
+curl https://bootstrap.pypa.io/ez_setup.py -o - | python
+tar -xvf setuptools-6.1.zip
+sudo ./ez_setup.py 
+sudo easy_install virtualenv
+
+virtualenv --no-site-packages django-alex
+
+source django-alex/bin/activate
+
+easy_install Django
+
+django-admin startproject django_test
+
+cd django_test/
+
+python manage.py runserver 0.0.0.0:8000
+
+deactivate

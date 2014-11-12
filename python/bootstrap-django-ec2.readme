@@ -1,0 +1,32 @@
+#!/bin/bash
+# Atualizar python 2.7 nas imagens 2.6
+# install build tools
+sudo yum install make automake gcc gcc-c++ kernel-devel git-core -y
+
+# install python 2.7 and change default python symlink
+sudo yum install python27-devel -y
+sudo rm /usr/bin/python
+sudo ln -s /usr/bin/python2.7 /usr/bin/python
+
+# yum still needs 2.6, so write it in and backup script 
+#sudo cp /usr/bin/yum /usr/bin/_yum_before_27
+#sudo sed -i s/python/python2.6/g /usr/bin/yum
+#sudo sed -i s/python2.6/python2.6/g /usr/bin/yum
+
+sudo curl https://bootstrap.pypa.io/ez_setup.py -o - | python
+unzip setuptools-6.1.zip 
+
+sudo /usr/bin/python27 ez_setup.py 
+sudo /usr/bin/easy_install-2.7 pip
+sudo pip install virtualenv
+
+sudo easy_install virtualenv
+virtualenv --no-site-packages django_root
+source django_root/bin/activate
+easy_install Django
+
+django-admin startproject django_test
+
+cd django_test/
+
+python manage.py runserver 0.0.0.0:8000
