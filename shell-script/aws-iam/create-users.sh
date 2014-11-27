@@ -3,24 +3,30 @@
 # create-users.sh - Criar um conjunto de usuarios no IAM e associa-los a um grupo bucket
 #
 # Exemplos:
-# $./create-users
+# $./create-users 5
 
-# Criar os usuarios
-aws iam create-user --user-name user1
-aws iam create-user --user-name user2
-aws iam create-user --user-name user3
+inicio=0;
+total_contas=$1;
 
-# Atribuir uma senha
-aws iam create-login-profile --user-name user1 --password password
-aws iam create-login-profile --user-name user2 --password password
-aws iam create-login-profile --user-name user3 --password password
+[ $inicio -lt $total_contas ] && o=+
 
 # Criar o grupo
 aws iam create-group --group-name demo
 
-# Associar usuarios ao grupo
-aws iam add-user-to-group --group-name demo --user-name user1
-aws iam add-user-to-group --group-name demo --user-name user2
-aws iam add-user-to-group --group-name demo --user-name user3
+while [ $inicio -ne $total_contas ]; do
+	username="user"$inicio
+	echo $username
+
+	# Criar os usuarios
+	aws iam create-user --user-name $username
+
+	# Atribuir uma senha
+	aws iam create-login-profile --user-name $username --password password
+
+	# Associar usuarios ao grupo
+	aws iam add-user-to-group --group-name demo --user-name $username
+
+	eval "inicio=$((inicio $o 1))"
+done
 
 

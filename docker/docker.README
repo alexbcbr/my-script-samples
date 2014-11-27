@@ -1,0 +1,71 @@
+sudo apt-get update
+
+apt-get install docker.io
+sudo ln -sf /usr/bin/docker.io /usr/local/bin/docker
+sudo sed -i '$acomplete -F _docker docker' /etc/bash_completion.d/docker.io 
+
+docker run -i -t ubuntu /bin/bash
+docker run --privileged -i -t ubuntu /bin/bash
+
+## docker run --net=host -i -t container-name
+##            --net=bridge
+##            --net=host
+##            --net=container:NAME
+##            --net=none
+##			-h hostname ou --hostname=HOSTNAME
+## 			--dns=IP_ADDRESS
+##			--dns-search=DOMAIN
+##			-P (mapeia portas de 49000 - 49900)
+##			-p (mapeia portas especificas) (ex: -p 0.0.0.0:49150:80 ou -p 192.168.0.45:80)
+##			--iptables=false|true (comunicação entre dockers. true permite a comunicação)
+
+docker inspect --format "{{ .State.Pid }}" aff812a376fa
+
+docker ps -a
+docker start aff812a376fa
+docker restart aff812a376fa
+
+docker cp aff812a376fa:/etc/network/interfaces /tmp
+docker logs aff812a376fa
+docker diff aff812a376fa
+docker pull debian
+docker images
+
+docker search apache
+docker search apache | grep ubuntu
+
+docker commit -a="alex" f6d16c0084fb shorewall-apache
+
+#Diretorio com variaveis de ambiente
+/var/lib/docker
+/etc/default/docker (daemon startup)
+
+docker <comando> ## Funciona como help
+
+docker inspect 23b6fb7788d8 ## Ver informações da instancia
+docker port ab3a2c4ee7e5 80
+docker history apache-a:latest ## avaliação nas imagens
+docker rm goofy_babbage ## remove container
+docker rmi armada/ubuntu-apache ## remove image
+
+###########################################
+service docker stop
+ip link set dev docker0 down
+ip route show
+brctl delbr docker0
+brctl addbr bridge0
+ip addr add 192.168.6.1/24 dev bridge0
+ip link set dev bridge0 up
+cd /etc/default
+vim docker.io 
+## Incluir DOCKER_OPTS=" -b=bridge0" no final do arquivo
+service docker start
+docker run -i -t apache-a /bin/bash
+
+
+
+
+
+
+
+

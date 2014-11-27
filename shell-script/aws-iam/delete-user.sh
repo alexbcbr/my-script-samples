@@ -3,24 +3,32 @@
 # delete-users.sh - Apaga todos os usuarios e grupos criados para a demot
 #
 # Exemplos:
-# $./delete-users
+# $./delete-users 5
 
-# Remove usuarios do grupo
-aws iam remove-user-from-group --user-name user1 --group-name demo
-aws iam remove-user-from-group --user-name user2 --group-name demo
-aws iam remove-user-from-group --user-name user3 --group-name demo
+inicio=0;
+total_contas=$1;
 
+[ $inicio -lt $total_contas ] && o=+
 
-# Apaga os usuarios
-aws iam delete-login-profile --user-name user1
-aws iam delete-login-profile --user-name user2
-aws iam delete-login-profile --user-name user3
+while [ $inicio -ne $total_contas ]; do
+	username="user"$inicio
+	echo $username
 
-# Apagar o login profile
-aws iam delete-user --user-name user1
-aws iam delete-user --user-name user2
-aws iam delete-user --user-name user3
+	# Remove usuarios do grupo
+	aws iam remove-user-from-group --user-name $username --group-name demo
 
+	# Apaga os usuarios
+	aws iam delete-login-profile --user-name $username
+
+	# Apagar o login profile
+	aws iam delete-user --user-name $username
+
+	eval "inicio=$((inicio $o 1))"
+done
+
+# Remover todas as policies de um grupo
+#aws iam delete-group-policy --group-name demo --policy-name AdministratorAccess-demo-201411241517
+#aws iam list-group-policies --group-name demo
 
 # Criar o grupo
 aws iam delete-group --group-name demo

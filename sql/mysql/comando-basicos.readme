@@ -13,3 +13,12 @@ use demo;
 source customers.sql
 
 TRUNCATE TABLE nome-da-tabela;
+
+CREATE TABLE Students (
+  id integer auto_increment,
+  name varchar(60),
+  PRIMARY KEY (id));
+
+describe table Students;
+
+insert into Students('Alex');

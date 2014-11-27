@@ -1,0 +1,16 @@
+sudo apt-get update
+sudo apt-get install lxc
+
+lxc-checkconfig
+lxc-ls --fancy
+
+lxc-create -t download -n u1 -- --dist ubuntu --release trusty --arch amd64
+lxc-create -t ubuntu -n u2
+lxc-destroy -n u1
+
+lxc-start -n u2 -d
+
+lxc-console -n u2
+
+#Diretorio com variaveis de ambiente
+/var/lib/lxc
