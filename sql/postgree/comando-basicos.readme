@@ -1,0 +1,18 @@
+sudo yum install postgresql-libs postgresql
+
+psql --host dbinst1.cftexyidv059.sa-east-1.rds.amazonaws.com --port=5432 --username=dbadmin --password --dbname=dbpostgree
+
+create database demo;
+drop database demo;
+
+\list (Show databases)
+\dt (show tables)
+
+CREATE TABLE Students (
+  id integer,
+  name varchar(60),
+  PRIMARY KEY (id));
+
+\d+ Students; (show table fields)
+
+insert into Students values(1, 'Alex');
