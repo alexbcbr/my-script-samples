@@ -1,3 +1,4 @@
+sudo yum install httpd php php-pgsql
 sudo yum install postgresql-libs postgresql
 
 psql --host dbinst1.cftexyidv059.sa-east-1.rds.amazonaws.com --port=5432 --username=dbadmin --password --dbname=dbpostgree
