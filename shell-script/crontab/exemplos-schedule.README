@@ -1,0 +1,8 @@
+crontab -e
+* * * * * echo "test" >> /home/cron-exemplo.txt (todo minuto)
+0 12 * * * ls /home >> ~/usuarios.txt (todo dia ao 12:00)
+15 * * * * ls /home > ~/teste.out (roda de 15 em 15 minutos)
+0 0 */3 * * ls /home > ~/teste.out (roda a cada 3 dias)
+
+crontab -l
+crontab -l -u alexbc

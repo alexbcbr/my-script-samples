@@ -1,0 +1,18 @@
+s3cmd mb s3://logix.cz-test
+s3cmd rb s3://demoapp.alexbc
+
+s3cmd put saude-demo.zip s3://alexbc.demoapp
+s3cmd put --recursive saude-demo s3://alexbc.demoapp/teste1/
+
+md5sum addressbook.xml
+
+s3cmd get s3://alexbc.demoapp/saude-demo.zip
+
+s3cmd del s3://demoapp.alexbc/saude-demo.zip
+s3cmd del --recursive s3://alexbc.demoapp/teste1/
+
+s3cmd sync saude-demo s3://alexbc.demoapp/teste/
+s3cmd sync --dry-run --delete-removed teste/ s3://alexbc.demoapp/testesync/ (ver a change)
+
+s3cmd info s3://alexbc.demoapp
+
