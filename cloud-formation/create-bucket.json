@@ -15,6 +15,10 @@
   "Resources": {
     "S3Bucket": {
       "Type": "AWS::S3::Bucket",
+      "Metadata": {
+        "Comment": "Bucket publico para leitura",
+        "Version" : "1.1"
+      },
       "Properties": {
         "AccessControl": "PublicRead",
         "BucketName": { "Ref": "NomeDoBucket"},
