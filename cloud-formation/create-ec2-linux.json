@@ -50,6 +50,7 @@
         "SecurityGroupIds" : { "Ref" : "SecurityGroupIds" },
         "KeyName" : { "Ref" : "KeyPairName" },
         "SubnetId" : { "Ref" : "SubnetId" },
+        "Monitoring" : "true",
         "Tags": [
           { "Key" : "Name", "Value": "LinuxSrv" },
           { "Key" : "Ambiente", "Value" : "Desenvolvimento" }
