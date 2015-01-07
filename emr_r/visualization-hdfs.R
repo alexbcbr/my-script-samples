@@ -1,8 +1,9 @@
 # Read file from HDFS using RHadoop
 # Author: Alex Coqueiro
 # API Support: https://github.com/RevolutionAnalytics/RHadoop/wiki/user-rhdfs-Home
+# Eg: source("~/emr_r/visualizacao-hdfs.R")
+#-----------------------------------------------------
 
-# Eg: source("~/emr_r/visualizacao.R")
 # set R environments
 Sys.setenv(HADOOP_CMD="/home/hadoop/bin/hadoop")
 Sys.setenv(HADOOP_STREAMING="/home/hadoop/contrib/streaming/hadoop-streaming.jar")
@@ -33,5 +34,7 @@ un1 <- table(df$unl.val.V1, df$unl.val.V2, df$unl.val.V3, dnn=c("Ethinicity", "R
 
 # visualization (show graph)
 library(vcd)
-mosaic(un1, shade=TRUE, legend=TRUE);
+png(filename="output-analysis.png")
+p <- mosaic(un1, shade=TRUE, legend=TRUE);
+dev.off()
 

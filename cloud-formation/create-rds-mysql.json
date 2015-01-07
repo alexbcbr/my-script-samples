@@ -1,0 +1,57 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Cria uma instancia RDS em MySQL",
+
+    "Parameters": {
+        "DBName": {
+            "Description": "Nome do Banco de dados",
+            "Type": "String"
+        },
+        "DBUser": {
+            "Description": "Usuario",
+            "Type": "String"
+        },
+        "DBPassword": {
+            "Description": "Senha",
+            "Type": "String",
+            "NoEcho" : "TRUE"
+        }
+    },
+
+    "Resources": {
+        "MyDB": {
+            "DeletionPolicy": "Snapshot",
+
+            "Properties": {
+                "Engine": "MySQL",
+                "EngineVersion": "5.6.21",
+                "DBInstanceClass": "db.t2.small",
+                "AllocatedStorage": "10",
+
+                "DBInstanceIdentifier": {
+                    "Ref": "DBName"
+                },
+
+                "DBName": {
+                    "Ref": "DBName"
+                },
+
+                "MasterUsername": {
+                    "Ref": "DBUser"
+                },
+
+                "MasterUserPassword": {
+                    "Ref": "DBPassword"
+                },
+
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "GovDemo MySQL via CloudFormation"
+                    }
+                ]
+            },
+            "Type": "AWS::RDS::DBInstance"
+        }
+    }
+}

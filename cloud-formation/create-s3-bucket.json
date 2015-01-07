@@ -1,0 +1,23 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Criar um bucket para armazenar arquivos",
+
+  "Parameters": {
+      "NomeDoBucket": {
+        "Description": "Forneca o nome do bucket a ser criado",
+        "Type": "String",
+        "Default": "meurepositorio",
+        "MaxLength": "20"
+      }
+  },
+
+  "Resources": {
+    "S3Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": { "Ref": "NomeDoBucket"}
+      }
+    }
+  }
+
+}

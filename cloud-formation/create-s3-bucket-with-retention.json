@@ -1,0 +1,29 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Criar um bucket para armazenar arquivos com retencao",
+
+  "Parameters": {
+      "NomeDoBucket": {
+        "Description": "Forneca o nome do bucket a ser criado",
+        "Type": "String",
+        "Default": "meurepositorio",
+        "MinLength": "5",
+        "MaxLength": "20"
+      }
+  },
+
+  "Resources": {
+    "S3Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "DeletionPolicy" : "Retain",
+      "Metadata": {
+        "Comment": "Bucket para armazenar arquivos",
+        "Version" : "1.0"
+      },
+      "Properties": {
+        "BucketName": { "Ref": "NomeDoBucket"}
+      }
+    }
+  }
+
+}

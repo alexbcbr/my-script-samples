@@ -4,11 +4,15 @@
 #
 # Exemplos:
 # $./deploy-sep-hadoop-R.sh pt sa-east-1 hadoop-keypair.pem sep.emr.demo
-# $./deploy-sep-hadoop-R.sh es us-west-2 oregon-hadoop-keypair.pem sep.emr.demo
+# $./deploy-sep-hadoop-R.sh es us-west-2 oregon-hadoop-keypair.pem sep.emr.demo4
 # 
 #
 # Revisions:
 # Versao 1.0 - First version for MacOSX and Linux
+#
+# Future Releases:
+# Script multiplatform
+# Ingestion & Output data in S3
 #
 #-----------------------------------------------------
 
@@ -20,14 +24,19 @@ then
 	az=$region"a"
 	bucket=$4
 else
+	echo "***************************************************"
 	echo "*** ERROR: Parameters are Invalid ! ***"
+	echo "You also need to install AWS CLI as well as you must configure your credentials <aws configure>"
+	echo "Sintax: ./deploy-sep-hadoop-R.sh <language en|es|pt> <region> <keypair.pem> <bucket>"
+	echo "Example: ./deploy-sep-hadoop-R.sh en us-west-2 oregon-hadoop-keypair.pem sep.emr.demo"
+	echo "***************************************************"
 	exit 1
 fi
 
 case "$language" in
    en)
 	welcome_message="... Beginnning ..."
-	waiting_message="... Cluster Privisioning in progress ..."
+	waiting_message="... Cluster Provisioning in progress ..."
 	closing_message="... Image available in your computer ..."
 	;;
    es)
@@ -84,8 +93,19 @@ ipmaster=$(aws emr describe-cluster --cluster-id $clusterid --region $region | g
 ipmaster=$(echo $ipmaster | cut -d':' -f2 | tr -d ' ' | tr -d "\"" | tr -d ",")
 
 chmod 400 oregon-hadoop-keypair.pem
-scp -i $keypair visualization-demo.R hadoop@$ipmaster:visualization-demo.R
-ssh -i $keypair hadoop@$ipmaster 'Rscript visualization-demo.R'
-scp -i $keypair hadoop@$ipmaster:arquivo.png arquivo.png
+
+scp -i $keypair -o StrictHostKeyChecking=no visualization-demo.R hadoop@$ipmaster:visualization-demo.R
+scp -i $keypair -o StrictHostKeyChecking=no visualization-hdfs.R hadoop@$ipmaster:visualization-hdfs.R
+scp -i $keypair -o StrictHostKeyChecking=no setup.R hadoop@$ipmaster:setup.R
+
+scp -i $keypair -o StrictHostKeyChecking=no data/unemployment2.csv hadoop@$ipmaster:unemployment2.csv
+
+ssh -i $keypair -o StrictHostKeyChecking=no hadoop@$ipmaster 'hadoop fs -mkdir /tmp/data/'
+ssh -i $keypair -o StrictHostKeyChecking=no hadoop@$ipmaster 'hadoop fs -put unemployment2.csv /tmp/data/unemployment2.csv'
+
+ssh -i $keypair -o StrictHostKeyChecking=no hadoop@$ipmaster 'sudo Rscript setup.R'
+ssh -i $keypair -o StrictHostKeyChecking=no hadoop@$ipmaster 'Rscript visualization-hdfs.R'
+
+scp -i $keypair -o StrictHostKeyChecking=no hadoop@$ipmaster:output-analysis.png output-analysis.png
 
 echo $closing_message
