@@ -27,8 +27,8 @@ while [ $inicio -ne $total_contas ]; do
 done
 
 # Remover todas as policies de um grupo
-#aws iam delete-group-policy --group-name demo --policy-name AdministratorAccess-demo-201411241517
 #aws iam list-group-policies --group-name demo
+#aws iam delete-group-policy --group-name demo --policy-name AdministratorAccess-demo-201411241517
 
 # Criar o grupo
 aws iam delete-group --group-name demo

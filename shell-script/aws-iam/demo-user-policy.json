@@ -1,0 +1,25 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1420662533000",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:DescribeImages"
+      ],
+      "Resource": [
+        "*"
+      ]
+    },
+    {
+      "Sid": "Stmt1420662602000",
+      "Effect": "Allow",
+      "Action": [
+        "s3:*"
+      ],
+      "Resource": [
+        "*"
+      ]
+    }
+  ]
+}
