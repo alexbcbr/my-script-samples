@@ -1,0 +1,97 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "Criar SQS com topico no SNS e alarme do CloudWatch",
+
+  "Parameters" : {
+    "AlarmEmail": {
+      "Default": "email@dominio.com",
+      "Description": "Email de quem sera notificado em caso de problemas",
+      "Type": "String"
+    },
+
+    "QueueName": {
+      "Default": "gov",
+      "Description": "Nome da fila",
+      "Type": "String"
+    }
+  },
+ 
+  "Resources" : {
+    "MyQueue" : {
+      "Type" : "AWS::SQS::Queue",
+      "Properties" : {
+         "QueueName" : { "Ref": "QueueName" }
+      }
+    },
+
+    "MyQueuePolicy":{
+      "Type":"AWS::SQS::QueuePolicy",
+      "Properties":{        
+        "PolicyDocument":{
+          "Version":"2012-10-17",
+          "Id":"MyQueuePolicy",
+          "Statement":[
+            {
+              "Sid":"Allow-SendMessage-To-Queues",
+              "Effect":"Allow",           
+              "Principal": {"AWS": "*"},
+              "Action":["sqs:SendMessage", "sqs:ReceiveMessage"],
+              "Resource":"*"
+            }
+          ]
+        },
+        "Queues":[{"Ref":"MyQueue"}]
+      }
+    },
+
+    "AlarmTopic": {
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "DisplayName": "SQS-Legado-TOPICO-GOV",
+        "Subscription": [{
+          "Endpoint": { "Ref": "AlarmEmail" },
+          "Protocol": "email"
+        }]
+      }
+    },
+
+    "QueueDepthAlarm": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "AlarmName": "SQS-Legado-Alarme-GOV",
+        "AlarmDescription": "Alarme se houver mais que 10 mensagens aguardando",
+        "Namespace": "AWS/SQS",
+        "MetricName": "ApproximateNumberOfMessagesVisible",
+        "Dimensions": [{
+          "Name": "QueueName",
+          "Value" : { "Fn::GetAtt" : ["MyQueue", "QueueName"] }
+        }],
+        "Statistic": "Sum",
+        "Period": "300",
+        "EvaluationPeriods": "1",
+        "Threshold": "10",
+        "ComparisonOperator": "GreaterThanThreshold",
+        "AlarmActions": [{
+          "Ref": "AlarmTopic"
+        }],
+        "InsufficientDataActions": [{
+          "Ref": "AlarmTopic"
+        }]
+      }
+    }
+  },
+  "Outputs" : {
+    "QueueURL" : {
+      "Description" : "URL da SQS Queue criada",
+      "Value" : { "Ref" : "MyQueue" }
+    },
+    "QueueARN" : {
+      "Description" : "ARN da SQS Queue",
+      "Value" : { "Fn::GetAtt" : ["MyQueue", "Arn"]}
+    },
+    "QueueName" : {
+      "Description" : "Nome da Queue",
+      "Value" : { "Fn::GetAtt" : ["MyQueue", "QueueName"]}
+    }
+  }
+}

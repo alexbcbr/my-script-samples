@@ -9,14 +9,14 @@
       "Description": "Vpc id de uma VPC existente"
     },
 
-    "KeyPairName" : {
-      "Description" : "Nome da EC2 KeyPair para acessar o SSH access na instancia",
-      "Type" : "AWS::EC2::KeyPair::KeyName"
-    },
-
     "SubnetId" : {
       "Type": "AWS::EC2::Subnet::Id",
       "Description": "Subnet id em uma VPC existente"
+    },
+
+    "KeyPairName" : {
+      "Description" : "Nome da EC2 KeyPair para acessar o SSH access na instancia",
+      "Type" : "AWS::EC2::KeyPair::KeyName"
     },
 
     "SecurityGroupIds" : {
@@ -24,7 +24,6 @@
       "Type": "List<AWS::EC2::SecurityGroup::Id>",
       "ConstraintDescription": "must be list of EC2 security group ids"
     }
-
   },
 
 
@@ -53,7 +52,9 @@
         "Monitoring" : "true",
         "Tags": [
           { "Key" : "Name", "Value": "LinuxSrv" },
-          { "Key" : "Ambiente", "Value" : "Desenvolvimento" }
+          { "Key" : "Ambiente", "Value" : "Desenvolvimento" },
+          { "Key" : "Departamento", "Value" : "Saude Publica" },
+          { "Key" : "Sistema", "Value" : "Denuncia" }
         ]
       }
     }
