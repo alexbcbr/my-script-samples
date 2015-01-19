@@ -1,0 +1,96 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "Cria uma instancia EC2 Amazon Linux na regiao de SP com PHP",
+
+  "Parameters" : {
+
+    "VpcId" : {
+      "Type": "AWS::EC2::VPC::Id",
+      "Description": "Vpc id de uma VPC existente", 
+      "Default": "vpc-fddc7b98"
+    },
+
+    "SubnetId" : {
+      "Type": "AWS::EC2::Subnet::Id",
+      "Description": "Subnet id em uma VPC existente",
+      "Default": "subnet-22724a56"
+    },
+
+    "KeyPairName" : {
+      "Description" : "Nome da EC2 KeyPair para acessar o SSH access na instancia",
+      "Type" : "AWS::EC2::KeyPair::KeyName",
+      "Default": "education-keypair"
+    },
+
+    "SecurityGroupIds" : {
+      "Description": "Escolha o security Group",
+      "Type": "List<AWS::EC2::SecurityGroup::Id>",
+      "ConstraintDescription": "must be list of EC2 security group ids"
+    }
+  },
+
+
+  "Mappings" : {
+    "RegionMap" : {
+      "us-east-1" : {
+          "AMI" : "ami-76f0061f"
+      },
+      "us-west-1" : {
+          "AMI" : "ami-655a0a20"
+      },
+      "sa-east-1" : {
+          "AMI" : "ami-c7e649da"
+      }
+    }
+  },
+
+  "Resources" : {
+    "Ec2Instance" : {
+      "Type" : "AWS::EC2::Instance",
+      "Properties" : {
+        "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ]},
+        "SecurityGroupIds" : { "Ref" : "SecurityGroupIds" },
+        "KeyName" : { "Ref" : "KeyPairName" },
+        "SubnetId" : { "Ref" : "SubnetId" },
+        "Monitoring" : "true",
+        "Tags": [
+          { "Key" : "Name", "Value": "saude-demo" },
+          { "Key" : "Ambiente", "Value" : "Desenvolvimento" },
+          { "Key" : "Departamento", "Value" : "Saude Publica" },
+          { "Key" : "Sistema", "Value" : "Denuncia" }
+        ],
+        "UserData": {
+              "Fn::Base64": {
+                  "Fn::Join": [
+                      "",
+                      [
+                          "#!/bin/bash\n",
+                          "# Atualizar seguranca antes do CfnInit\n",
+                          "# yum update -y --security\n",
+                          "yum install -y httpd php mysql php-mysql\n",
+                          "service httpd start\n",
+                          "chkconfig httpd on\n",
+                          "wget https://s3.amazonaws.com/alexbc.demoapp/saude-demo.zip\n",
+                          "unzip saude-demo.zip\n",
+                          "mv saude-demo /var/www/html\n",
+                          "chown -R ec2-user:apache /var/www/html\n",
+                          "chmod -R 2775 /var/www/html"
+                      ]
+                  ]
+              }
+          }
+      }
+    }
+  },
+
+  "Outputs" : {
+    "InstanceId" : {
+      "Description" : "InstanceId que foi criada",
+      "Value" : { "Ref" : "Ec2Instance" }
+    },
+    "PublicIP" : {
+      "Description" : "Public IP address que foi criado",
+      "Value" : { "Fn::GetAtt" : [ "Ec2Instance", "PublicIp" ] }
+    }
+  }
+}
