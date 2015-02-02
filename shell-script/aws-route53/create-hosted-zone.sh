@@ -1,0 +1,1 @@
+aws route53 create-hosted-zone --name dominio.com.br --caller-reference 2014-04-01-18:47 --hosted-zone-config Comment="exemplo"

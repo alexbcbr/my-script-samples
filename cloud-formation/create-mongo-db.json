@@ -1,0 +1,95 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "Cria uma instancia do MongoDB Server em Linux",
+
+  "Parameters" : {
+
+    "VpcId" : {
+      "Type": "AWS::EC2::VPC::Id",
+      "Description": "Vpc id de uma VPC existente"
+    },
+
+    "SubnetId" : {
+      "Type": "AWS::EC2::Subnet::Id",
+      "Description": "Subnet id em uma VPC existente"
+    },
+
+    "KeyPairName" : {
+      "Description" : "Nome da EC2 KeyPair para acessar o SSH access na instancia",
+      "Type" : "AWS::EC2::KeyPair::KeyName"
+    },
+
+    "SecurityGroupIds" : {
+      "Description": "Escolha o security Group",
+      "Type": "List<AWS::EC2::SecurityGroup::Id>",
+      "ConstraintDescription": "must be list of EC2 security group ids"
+    }
+  },
+
+
+  "Mappings" : {
+    "RegionMap" : {
+      "us-east-1" : {
+          "AMI" : "ami-76f0061f"
+      },
+      "us-west-1" : {
+          "AMI" : "ami-655a0a20"
+      },
+      "sa-east-1" : {
+          "AMI" : "ami-c7e649da"
+      }
+    }
+  },
+
+  "Resources" : {
+    "Ec2Instance" : {
+      "Type" : "AWS::EC2::Instance",
+      "Properties" : {
+        "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ]},
+        "SecurityGroupIds" : { "Ref" : "SecurityGroupIds" },
+        "KeyName" : { "Ref" : "KeyPairName" },
+        "SubnetId" : { "Ref" : "SubnetId" },
+        "Monitoring" : "true",
+        "Tags": [
+          { "Key" : "Name", "Value": "MongoDB Serrver" },
+          { "Key" : "Ambiente", "Value" : "Desenvolvimento" },
+          { "Key" : "Departamento", "Value" : "Saude Publica" },
+          { "Key" : "Sistema", "Value" : "Perfil de Cidadao" }
+        ],
+        "UserData": {
+              "Fn::Base64": {
+                  "Fn::Join": [
+                      "",
+                      [
+                          "#!/bin/bash\n",
+                          "# Atualizar seguranca antes do CfnInit\n",
+                          "# yum update -y --security\n",
+                          "wget https://s3.amazonaws.com/alexbc.demoapp/10gen.repo\n",
+                          "mv 10gen.repo /etc/yum.repos.d\n",
+                          "yum install -y mongo-10gen-server sysstat mongo-10gen\n",
+                          "sed -i 's/bind_ip/#bind_ip/' /etc/mongod.conf\n",
+                          "service mongod start\n",
+                          "chkconfig mongod on\n"
+                      ]
+                  ]
+              }
+          }
+      }
+    }
+  },
+
+  "Outputs" : {
+    "InstanceId" : {
+      "Description" : "InstanceId que foi criada",
+      "Value" : { "Ref" : "Ec2Instance" }
+    },
+    "AZ" : {
+      "Description" : "Availability Zone que foi criada",
+      "Value" : { "Fn::GetAtt" : [ "Ec2Instance", "AvailabilityZone" ] }
+    },
+    "PublicIP" : {
+      "Description" : "Public IP address que foi criado",
+      "Value" : { "Fn::GetAtt" : [ "Ec2Instance", "PublicIp" ] }
+    }
+  }
+}
