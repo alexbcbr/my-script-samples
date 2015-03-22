@@ -38,6 +38,9 @@
       "us-west-1" : {
           "AMI" : "ami-655a0a20"
       },
+      "us-west-2" : {
+          "AMI" : "ami-dfc39aef"
+      },
       "sa-east-1" : {
           "AMI" : "ami-c7e649da"
       }

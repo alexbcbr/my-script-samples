@@ -16,6 +16,7 @@ s3cmd del --recursive --force s3://alexbc.demoapp/ (apagar todos o bucket)
 
 s3cmd sync saude-demo s3://alexbc.demoapp/teste/
 s3cmd sync --dry-run --delete-removed teste/ s3://alexbc.demoapp/testesync/ (ver a change)
+s3cmd sync s3://redshift-lab-oregon s3://alexbc.dw.flight --bucket-location=us-west-2 (entre buckets)
 
 s3cmd info s3://alexbc.demoapp
 
