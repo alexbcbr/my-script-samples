@@ -1,0 +1,10 @@
+aws dynamodb list-tables
+
+aws dynamodb create-table --table-name Clientes --attribute-definitions AttributeName=Empresa,AttributeType=S AttributeName=Industria,AttributeType=S --key-schema AttributeName=Empresa,KeyType=HASH AttributeName=Industria,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=1
+
+aws dynamodb put-item --table-name Clientes --item file://registro.json --return-consumed-capacity TOTAL
+
+aws dynamodb scan --table-name Clientes
+
+aws dynamodb delete-table --table-name Clientes
+
