@@ -35,6 +35,7 @@ sudo service apache2 restart
 #Migrando o database para RDS
 #mysqldump -u ubuntu -p --databases wordpress-db | mysql --host=<RDS-Endpoint> --port=3306 --user=ubuntu --password=<password>
 mysqldump -u ubuntu -p --databases wordpressdb | mysql --host=mydbinstance.us-eats-1.rds.amazonaws.com --port=3306 --user ubuntu --password=password
+mysqldump -u root -p --databases demo | mysql --host=dbdemo.cftexyidv059.sa-east-1.rds.amazonaws.com -u dbadmin --password=Passw0rd
 
 ## Instalar o Varnish (Cache & http reverse proxy)
 

@@ -1,6 +1,12 @@
+# Dump de mysql
+mysqldump -u root -p --databases demo | mysql --host=dbdemo.cftexyidv059.sa-east-1.rds.amazonaws.com -u dbadmin --password=password
+
+######## comandos mysql
+
 sudo yum install mysql
 
 mysql -h govinstance.cftexyidv059.sa-east-1.rds.amazonaws.com -u dbadmin -p
+mysql -u root -p
 
 create database demo;
 drop database demo;
@@ -21,4 +27,4 @@ CREATE TABLE Students (
 
 describe table Students;
 
-insert into Students('Alex');
+insert into Students values (1, 'Alex');

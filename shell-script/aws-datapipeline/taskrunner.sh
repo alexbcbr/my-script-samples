@@ -1,0 +1,1 @@
+java -jar ~/opensource/aws-taskrunner/TaskRunner-1.0.jar --config ~/credentials.json --workerGroup=[myWorkerGroup]
