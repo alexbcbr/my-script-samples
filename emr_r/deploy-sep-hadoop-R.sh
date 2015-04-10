@@ -3,8 +3,8 @@
 # deploy-sep-hadoop-R.sh - Deploy an environment with Hadoop and R and run a R script to plot a graph
 #
 # Exemplos:
-# $./deploy-sep-hadoop-R.sh pt sa-east-1 hadoop-keypair.pem sep.emr.demo
-# $./deploy-sep-hadoop-R.sh es us-west-2 oregon-hadoop-keypair.pem sep.emr.demo4
+# $./deploy-sep-hadoop-R.sh pt sa-east-1 hadoop-keypair sep.emr.demo
+# $./deploy-sep-hadoop-R.sh es us-west-2 oregon-hadoop-keypair sep.emr.demo4
 # 
 #
 # Revisions:
@@ -21,14 +21,15 @@ then
 	language=$1
 	region=$2
 	keypair=$3
-	az=$region"a"
+	keypair_pem=$keypair".pem"
+	az=$region"b"
 	bucket=$4
 else
 	echo "***************************************************"
 	echo "*** ERROR: Parameters are Invalid ! ***"
 	echo "You also need to install AWS CLI as well as you must configure your credentials <aws configure>"
 	echo "Sintax: ./deploy-sep-hadoop-R.sh <language en|es|pt> <region> <keypair.pem> <bucket>"
-	echo "Example: ./deploy-sep-hadoop-R.sh en us-west-2 oregon-hadoop-keypair.pem sep.emr.demo"
+	echo "Example: ./deploy-sep-hadoop-R.sh en us-east-1 virginia sep.emr.demo"
 	echo "***************************************************"
 	exit 1
 fi
@@ -76,9 +77,9 @@ mkdir logs
 touch logs/init.log
 aws s3 sync logs s3://$bucket/logs/ --region $region
 
-clusterid=$(aws emr create-cluster --enable-debugging --log-uri s3://$bucket/logs --ami-version 3.2.1 --instance-groups InstanceGroupType=MASTER,InstanceCount=1,InstanceType=m1.medium InstanceGroupType=CORE,InstanceCount=2,InstanceType=m1.medium --bootstrap-actions Path=s3://$bucket/emr-bootstrap-actions/R/Hadoop/emR_bootstrap.sh,Name=CustomAction,Args=[--rstudio,--rexamples,--plyrmr,--rhdfs] --steps Name=HDFS_tmp_permission,Jar=s3://elasticmapreduce/libs/script-runner/script-runner.jar,Args=s3://$bucket/emr-bootstrap-actions/R/Hadoop/hdfs_permission.sh --region $region --ec2-attributes KeyName=oregon-hadoop-keypair,AvailabilityZone=$az --no-auto-terminate --name sep-EMR-R --tags Name=SEP_EMR_R)
+clusterid=$(aws emr create-cluster --enable-debugging --log-uri s3://$bucket/logs --ami-version 3.2.1 --instance-groups InstanceGroupType=MASTER,InstanceCount=1,InstanceType=m3.xlarge InstanceGroupType=CORE,InstanceCount=2,InstanceType=m3.xlarge --bootstrap-actions Path=s3://$bucket/emr-bootstrap-actions/R/Hadoop/emR_bootstrap.sh,Name=CustomAction,Args=[--rstudio,--rexamples,--plyrmr,--rhdfs] --steps Name=HDFS_tmp_permission,Jar=s3://elasticmapreduce/libs/script-runner/script-runner.jar,Args=s3://$bucket/emr-bootstrap-actions/R/Hadoop/hdfs_permission.sh --region $region --ec2-attributes KeyName=$keypair,AvailabilityZone=$az --no-auto-terminate --name sep-EMR-R --tags Name=SEP_EMR_R)
 echo $clusterid
-clusterid=$(echo $clusterid | cut -d':' -f2 | tr -d ' ' | tr -d "\"" | tr -d "}")
+clusterid=$(echo $clusterid | cut -d'|' -f5 | tr -d ' ' | tr -d "\"" | tr -d "}")
 echo $clusterid
 
 status="0"
@@ -89,23 +90,27 @@ while [ $status -eq "0" ]; do
 	sleep 15
 done
 
-ipmaster=$(aws emr describe-cluster --cluster-id $clusterid --region $region | grep MasterPublicDnsName)
-ipmaster=$(echo $ipmaster | cut -d':' -f2 | tr -d ' ' | tr -d "\"" | tr -d ",")
+aws emr list-instances --cluster-id j-3PECZXHMVUH1Z --region us-east-1 --instance-group-types MASTER
+ipmaster=$(aws emr list-instances --cluster-id $clusterid --region $region --instance-group-types MASTER | grep PublicIpAddress)
+echo $ipmaster
 
-chmod 400 oregon-hadoop-keypair.pem
+ipmaster=$(echo $ipmaster | cut -d'|' -f4 | tr -d ' ')
+echo $ipmaster
 
-scp -i $keypair -o StrictHostKeyChecking=no visualization-demo.R hadoop@$ipmaster:visualization-demo.R
-scp -i $keypair -o StrictHostKeyChecking=no visualization-hdfs.R hadoop@$ipmaster:visualization-hdfs.R
-scp -i $keypair -o StrictHostKeyChecking=no setup.R hadoop@$ipmaster:setup.R
+chmod 400 $keypair_pem
 
-scp -i $keypair -o StrictHostKeyChecking=no data/unemployment2.csv hadoop@$ipmaster:unemployment2.csv
+scp -i $keypair_pem -o StrictHostKeyChecking=no visualization-demo.R hadoop@$ipmaster:visualization-demo.R
+scp -i $keypair_pem -o StrictHostKeyChecking=no visualization-hdfs.R hadoop@$ipmaster:visualization-hdfs.R
+scp -i $keypair_pem -o StrictHostKeyChecking=no setup.R hadoop@$ipmaster:setup.R
 
-ssh -i $keypair -o StrictHostKeyChecking=no hadoop@$ipmaster 'hadoop fs -mkdir /tmp/data/'
-ssh -i $keypair -o StrictHostKeyChecking=no hadoop@$ipmaster 'hadoop fs -put unemployment2.csv /tmp/data/unemployment2.csv'
+scp -i $keypair_pem -o StrictHostKeyChecking=no data/unemployment2.csv hadoop@$ipmaster:unemployment2.csv
 
-ssh -i $keypair -o StrictHostKeyChecking=no hadoop@$ipmaster 'sudo Rscript setup.R'
-ssh -i $keypair -o StrictHostKeyChecking=no hadoop@$ipmaster 'Rscript visualization-hdfs.R'
+ssh -i $keypair_pem -o StrictHostKeyChecking=no hadoop@$ipmaster 'hadoop fs -mkdir /tmp/data/'
+ssh -i $keypair_pem -o StrictHostKeyChecking=no hadoop@$ipmaster 'hadoop fs -put unemployment2.csv /tmp/data/unemployment2.csv'
 
-scp -i $keypair -o StrictHostKeyChecking=no hadoop@$ipmaster:output-analysis.png output-analysis.png
+ssh -i $keypair_pem -o StrictHostKeyChecking=no hadoop@$ipmaster 'sudo Rscript setup.R'
+ssh -i $keypair_pem -o StrictHostKeyChecking=no hadoop@$ipmaster 'Rscript visualization-hdfs.R'
+
+scp -i $keypair_pem -o StrictHostKeyChecking=no hadoop@$ipmaster:output-analysis.png output-analysis.png
 
 echo $closing_message

@@ -1,0 +1,16 @@
+export PS1="\[\033[0m\]\w\$ "
+alias ll='ls -lG'
+PATH="/usr/local/opt/coreutils/libexec/gnubin:$PATH"
+MANPATH="/usr/local/opt/coreutils/libexec/gnuman:$MANPATH"
+
+#Configuracao de JDK
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_25.jdk/Contents/Home
+
+#Configuracao de classpatth para Maven
+export M2_HOME=/usr/local/apache-maven/apache-maven-3.2.5
+export M2=$M2_HOME/bin
+PATH=$M2:$PATH
+
+#Email para aplicacao de notificacao
+export CONFIG_DEMO_APP_PATH=~/config-demo.properties
+
