@@ -1,0 +1,12 @@
+sudo yum install openswan
+# mudar arquivo /etc/ipsec.conf tirando comentario do include /etc/ipsec.d/*conf
+# criar arquivo vpc1-to-vpc2.conf na vpn1 e vpc2-to-vpc1.conf na segunda maquina
+# criar arquivos vp1-to-vpc2.secrets e vpc2-to-vpc1.secrets
+
+sudo service ipsec start
+sudo chkconfig ipsec on
+
+# mudar arquivo /etc/sysclt.conf no parametro net.ipv4.ip_forward de 0 para 1 nas duas maquinas
+
+service network restart
+
