@@ -1,7 +1,7 @@
 {
     
   "AWSTemplateFormatVersion" : "2010-09-09",
-  "Description" : "Cria uma VPC com uma instancia EC2",
+  "Description" : "Cria uma VPC com uma instancia EC2 e testei UpdateStack",
 
   "Mappings" : {
 
@@ -45,7 +45,8 @@
         "CidrBlock" : { "Fn::FindInMap" : [ "SubnetConfig", "Public", "CIDR" ]},
         "Tags" : [
           {"Key" : "Application", "Value": {"Ref" : "AWS::StackName"}},
-          {"Key" : "Network", "Value": "Public"}
+          {"Key" : "Network", "Value": "Public"},
+          {"Key" : "departamento", "Value": "Financas"}
         ]
       }
     },
